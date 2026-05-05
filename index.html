@@ -2,31 +2,48 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F2D6E">
 <title>Atelier das Mãos — Nail Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --primary:      #2E6BE0;
-    --primary-deep: #1A52C0;
-    --primary-glow: #5E92F0;
-    --bg:           #0F2D6E;
-    --bg-mid:       #1A428C;
-    --off-white:    #EDF2FC;
-    --cream:        #D0DEFA;
-    --parchment:    #A0B8F5;
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-body:    'Jost', sans-serif;
-    --ease-out:     cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
-    --logo-size:    132px;
-    --logo-half:    66px;
-    --arc-depth:    20px;
+    --primary:        #2E6BE0;
+    --primary-deep:   #1A52C0;
+    --primary-glow:   #5E92F0;
+    --bg:             #0F2D6E;
+    --bg-deep:        #070F30;
+    --off-white:      #EDF2FC;
+    --text-strong:    #FFFFFF;
+    --text-soft:      #E8EFFC;
+    --text-muted:     #B8C8E8;
+
+    /* Form (dark/blue surface) */
+    --form-ink:         #FFFFFF;
+    --form-ink-soft:    #C8D6F0;
+    --form-line:        rgba(180, 205, 245, 0.35);
+    --form-line-strong: #5E92F0;
+    --form-bg:          rgba(8, 22, 60, 0.55);
+    --form-surface:     rgba(15, 35, 90, 0.45);
+
+    /* Success / error */
+    --success:        #1F9D55;
+    --success-deep:   #167A40;
+    --error:          #D93A4F;
+
+    --font-display:   'Cormorant Garamond', Georgia, serif;
+    --font-body:      'Jost', sans-serif;
+    --ease-out:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);
+
+    --logo-size:      132px;
+    --logo-half:      66px;
+    --arc-depth:      20px;
     --arc-top-offset: 46px;
   }
 
@@ -35,12 +52,16 @@
   body {
     font-family: var(--font-body);
     background: var(--bg);
-    color: var(--off-white);
+    color: var(--text-soft);
     min-height: 100dvh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  body.no-scroll { overflow: hidden; }
+
+  /* Subtle grain */
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -55,7 +76,6 @@
       radial-gradient(ellipse 50% 40% at 10% 80%, rgba(14,38,110,0.38) 0%, transparent 55%),
       linear-gradient(175deg, #070F30 0%, #0F2D6E 35%, #1A428C 65%, #070F30 100%);
   }
-  /* hero-bg-img: removido — fundo limpo sem imagem global */
 
   main {
     position: relative; z-index: 1;
@@ -66,44 +86,16 @@
   }
 
   /* ═══════════════════════════════════════════════
-     COVER — clip-path com a MESMA bezier do SVG bridge.
-
-     Problema original: border-radius gera curva ELÍPTICA;
-     o SVG bridge usa bezier QUADRÁTICA — formas distintas
-     que se desalinham em qualquer largura de viewport.
-
-     Solução: clip-path: url(#coverClip) com clipPath
-     em objectBoundingBox, usando a mesma equação que o
-     bridge path "M 0 0 Q 50 40 100 0".
-
-     Math (objectBoundingBox, cover height = 205px):
-       — Bridge top (bordas) = 185px → 185/205 = 0.9024
-       — Bridge dip (centro)  = 205px → 205/205 = 1.0
-       — Bezier ctrl Cy: 2×1.0 − (0.9024+0.9024)×0.5 = 1.0976
-       — Path: M 0 0 L 1 0 L 1 0.9024 Q 0.5 1.0976 0 0.9024 Z
-
-     Isso garante que a borda inferior do banner coincide
-     pixel a pixel com a linha curva SVG, em qualquer
-     largura de tela.
+     COVER  (intacto)
   ═══════════════════════════════════════════════ */
   .cover-section {
     position: relative;
     height: 205px;
     margin-left: -20px; margin-right: -20px;
     flex-shrink: 0;
-    /* clip-path substitui border-radius — recorte pela
-       curva bezier idêntica ao bridge SVG              */
     clip-path: url(#coverClip);
-    /* overflow:hidden como fallback adicional */
     overflow: hidden;
   }
-
-  /* ── AJUSTE 1: banner responsivo ──
-     background-size:cover  = object-fit:cover (sem distorção)
-     background-position:center center → foco central equilibrado
-       mobile : corte simétrico, sem zoom exagerado
-       desktop: sem esticamento
-     clip-path do pai garante o recorte exato na linha curva. */
   .cover-section-img {
     position: absolute; inset: 0;
     background-image: url('https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1200&q=80');
@@ -111,16 +103,8 @@
     background-position: center center;
     opacity: 0.82;
   }
-
-  /* ── AJUSTE 2: overlay de cor REMOVIDO ──
-     O div .cover-section-overlay foi suprimido do HTML.
-     O gradiente abaixo serve apenas como vinheta suave
-     nas bordas para integrar ao fundo escuro — sem
-     camada vermelha sólida sobre a imagem.             */
   .cover-section-vignette {
     position: absolute; inset: 0;
-    /* Vinheta mínima: escurece só as bordas e o fundo,
-       sem sufocar a imagem central */
     background: linear-gradient(
       to bottom,
       rgba(8, 18, 60, 0.18) 0%,
@@ -131,7 +115,7 @@
   }
 
   /* ═══════════════════════════════════════════════
-     PROFILE JUNCTION
+     PROFILE JUNCTION  (intacto)
   ═══════════════════════════════════════════════ */
   .profile-junction {
     position: relative;
@@ -140,7 +124,6 @@
     flex-shrink: 0;
     z-index: 2;
   }
-
   .bridge-svg {
     position: absolute;
     top: var(--arc-top-offset);
@@ -150,16 +133,13 @@
     display: block;
     overflow: visible;
   }
-
   .bridge-base {
     fill: none;
     stroke: rgba(30, 80, 180, 0.45);
     stroke-width: 0.9;
     vector-effect: non-scaling-stroke;
   }
-
-  .bridge-shine-l,
-  .bridge-shine-r {
+  .bridge-shine-l, .bridge-shine-r {
     fill: none;
     stroke: rgba(94, 146, 240, 0.82);
     stroke-width: 1.5;
@@ -167,24 +147,19 @@
     stroke-dasharray: 28 300;
     stroke-dashoffset: 328;
     vector-effect: non-scaling-stroke;
+    animation: bridge-shimmer 5s ease-in-out infinite;
   }
-  .bridge-shine-l { animation: bridge-shimmer 5s ease-in-out infinite; }
-  .bridge-shine-r { animation: bridge-shimmer 5s ease-in-out infinite; }
-
   @keyframes bridge-shimmer {
-    0%,  5%   { stroke-dashoffset: 328; opacity: 0;   }
-    11%        { opacity: 1;                           }
+    0%,5%      { stroke-dashoffset: 328; opacity: 0; }
+    11%        { opacity: 1; }
     64%        { opacity: 0.86; stroke-dashoffset: -28; }
-    74%, 100%  { stroke-dashoffset: -28; opacity: 0;  }
+    74%,100%   { stroke-dashoffset: -28; opacity: 0; }
   }
-
   .profile-logo-circle {
     position: absolute;
-    top: 0;
-    left: 50%;
+    top: 0; left: 50%;
     transform: translateX(-50%);
-    width: var(--logo-size);
-    height: var(--logo-size);
+    width: var(--logo-size); height: var(--logo-size);
     border-radius: 50%;
     background: radial-gradient(circle at 38% 34%, #0F2D6E 0%, #060C28 52%, #020818 100%);
     border: 2.5px solid rgba(46,107,224,0.65);
@@ -203,23 +178,27 @@
     pointer-events: none;
   }
 
-  /* Identidade */
+  /* ═══════════════════════════════════════════════
+     IDENTIDADE  (tipografia reforçada)
+  ═══════════════════════════════════════════════ */
   .profile-identity-text {
     text-align: center; padding: 18px 0 0; margin-bottom: 6px; flex-shrink: 0;
   }
   .profile-studio-name {
     font-family: var(--font-display); font-size: 28px; font-weight: 600;
-    font-style: italic; color: var(--off-white);
+    font-style: italic; color: var(--text-strong);
     letter-spacing: 0.04em; line-height: 1; margin-bottom: 9px;
   }
   .profile-tagline {
-    font-family: var(--font-body); font-size: 14px; font-weight: 300;
-    line-height: 1.65; color: rgba(175,205,248,0.78); letter-spacing: 0.02em;
+    font-family: var(--font-body); font-size: 14px; font-weight: 500;
+    line-height: 1.65; color: var(--text-soft); letter-spacing: 0.015em;
   }
-  .profile-tagline em { font-style: normal; color: rgba(205,222,252,0.95); font-weight: 400; }
+  .profile-tagline em {
+    font-style: normal; color: var(--text-strong); font-weight: 600;
+  }
 
   /* ═══════════════════════════════════════════════
-     DIVISÓRIA COM ESTRELA
+     DIVISÓRIA  (intacto)
   ═══════════════════════════════════════════════ */
   .section-divider { display: flex; align-items: center; gap: 14px; margin: 28px 0; }
   .divider-line {
@@ -260,15 +239,16 @@
   }
   @keyframes diamond-pulse {
     0%, 52%   { opacity: 0.7;  transform: rotate(45deg) scale(1); }
-    65%        { opacity: 1;    transform: rotate(45deg) scale(1.45); filter: brightness(1.5); }
-    78%        { opacity: 0.88; transform: rotate(45deg) scale(1.10); filter: brightness(1.15); }
-    92%, 100%  { opacity: 0.7;  transform: rotate(45deg) scale(1);   filter: brightness(1); }
+    65%       { opacity: 1;    transform: rotate(45deg) scale(1.45); filter: brightness(1.5); }
+    78%       { opacity: 0.88; transform: rotate(45deg) scale(1.10); filter: brightness(1.15); }
+    92%, 100% { opacity: 0.7;  transform: rotate(45deg) scale(1);   filter: brightness(1); }
   }
 
   /* ═══════════════════════════════════════════════
-     BOTÕES
+     BOTÕES HOME  (intacto)
   ═══════════════════════════════════════════════ */
-  .professionals { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .professionals { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+
   .pro-btn {
     position: relative; display: flex; align-items: center; gap: 16px;
     padding: 0 20px 0 0;
@@ -278,6 +258,7 @@
     transition: transform 80ms var(--ease-out), box-shadow 120ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
     box-shadow: 0 2px 18px rgba(46,107,224,0.40), inset 0 1px 0 rgba(215,230,255,0.18);
+    width: 100%;
   }
   .pro-btn::before {
     content: ''; position: absolute; inset: 0;
@@ -294,8 +275,6 @@
   .pro-btn:hover::after  { opacity: 1; animation-duration: 4.5s; }
   .pro-btn:hover         { border-color: rgba(205,222,255,0.54); }
   .pro-btn:active { transform: scale(0.976); box-shadow: 0 1px 8px rgba(15,30,110,0.24), inset 0 2px 6px rgba(10,18,90,0.15); }
-  .pro-btn:active::before { opacity: 0.45; }
-  .pro-btn:active::after  { opacity: 0.18; animation-play-state: paused; }
   .pro-btn .glow-ring {
     position: absolute; inset: -2px; border-radius: 6px;
     border: 1.5px solid rgba(165,195,245,0.0); box-shadow: 0 0 0 0 rgba(46,107,224,0);
@@ -308,13 +287,26 @@
     border: 1.5px solid rgba(200,218,255,0.30);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 4px;
   }
-  .pro-avatar-placeholder span { font-family: var(--font-display); font-size: 20px; font-weight: 400; color: rgba(218,232,255,0.88); font-style: italic; }
+  .pro-avatar-placeholder span {
+    font-family: var(--font-display); font-size: 20px; font-weight: 500;
+    color: var(--text-strong); font-style: italic;
+  }
   .pro-info { flex: 1; text-align: left; }
-  .pro-role { font-family: var(--font-body); font-size: 9.5px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(215,228,255,0.72); margin-bottom: 3px; }
-  .pro-name { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: rgba(238,245,255,0.97); letter-spacing: 0.01em; line-height: 1; margin-bottom: 3px; }
-  .pro-action { font-family: var(--font-body); font-size: 11px; font-weight: 300; color: rgba(205,218,252,0.68); letter-spacing: 0.04em; }
-  .pro-arrow { flex-shrink: 0; opacity: 0.45; transition: opacity 200ms, transform 200ms; }
-  .pro-btn:hover .pro-arrow { opacity: 0.90; transform: translateX(2px); }
+  .pro-role {
+    font-family: var(--font-body); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-strong); margin-bottom: 3px; opacity: 0.92;
+  }
+  .pro-name {
+    font-family: var(--font-display); font-size: 22px; font-weight: 600;
+    color: var(--text-strong); letter-spacing: 0.01em; line-height: 1; margin-bottom: 3px;
+  }
+  .pro-action {
+    font-family: var(--font-body); font-size: 11.5px; font-weight: 500;
+    color: var(--text-strong); letter-spacing: 0.04em; opacity: 0.88;
+  }
+  .pro-arrow { flex-shrink: 0; opacity: 0.65; transition: opacity 200ms, transform 200ms; }
+  .pro-btn:hover .pro-arrow { opacity: 1; transform: translateX(2px); }
 
   .insta-btn {
     position: relative; display: flex; align-items: center; gap: 14px; padding: 0 20px;
@@ -332,154 +324,22 @@
   }
   .insta-btn:active { transform: scale(0.976); }
   .insta-btn:hover::before { opacity: 1; }
-  .insta-btn .insta-btn-glow {
-    position: absolute; inset: -2px; border-radius: 6px; border: 1.5px solid rgba(255,160,200,0.0);
-    transition: border-color 350ms var(--ease-out), box-shadow 350ms var(--ease-out); pointer-events: none;
-  }
-  .insta-btn:hover .insta-btn-glow { border-color: rgba(255,160,200,0.22); box-shadow: 0 0 18px rgba(193,53,132,0.2); }
   .insta-label { flex: 1; text-align: left; }
-  .insta-role { font-family: var(--font-body); font-size: 9.5px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,220,240,0.65); margin-bottom: 2px; }
-  .insta-name { font-family: var(--font-body); font-size: 14px; font-weight: 400; color: rgba(255,240,250,0.92); letter-spacing: 0.06em; }
+  .insta-role {
+    font-family: var(--font-body); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,240,250,0.85); margin-bottom: 2px;
+  }
+  .insta-name {
+    font-family: var(--font-body); font-size: 14px; font-weight: 600;
+    color: var(--text-strong); letter-spacing: 0.06em;
+  }
 
-  /* SERVIÇOS */
-  .services-section { margin-bottom: 28px; }
-  .services-label { font-family: var(--font-body); font-size: 9.5px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(160,190,245,0.55); margin-bottom: 12px; }
-  .services-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip { font-family: var(--font-body); font-size: 15px; font-weight: 400; color: rgba(8,16,55,0.92); padding: 10px 20px; border: 1px solid rgba(148,180,232,0.48); border-radius: 2px; letter-spacing: 0.04em; background: rgba(148,180,228,0.82); cursor: default; transition: all 180ms; }
-  .chip:hover { background: rgba(148,180,228,1); border-color: rgba(148,180,232,0.72); color: rgba(4,10,50,1); }
-
-  /* LOCALIZAÇÃO */
-  .location-section { padding: 20px 0; border-top: 1px solid rgba(46,107,224,0.28); margin-bottom: 32px; }
-  .location-label { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(185,210,248,0.80); margin-bottom: 10px; }
-  .location-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .location-address { font-family: var(--font-display); font-size: 21px; font-weight: 500; color: rgba(228,238,255,0.97); line-height: 1.6; letter-spacing: 0.01em; }
-  .copy-btn { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 7px 13px; background: rgba(175,205,255,0.10); border: 1px solid rgba(120,160,225,0.62); border-radius: 2px; cursor: pointer; font-family: var(--font-body); font-size: 12.5px; font-weight: 500; letter-spacing: 0.1em; color: rgba(205,222,252,0.92); transition: all 200ms; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
-  .copy-btn:hover { border-color: rgba(46,107,224,0.80); color: rgba(230,240,255,1); background: rgba(175,205,255,0.18); }
-  .copy-btn.copied { border-color: rgba(90,180,100,0.5); color: rgba(140,220,140,0.85); background: rgba(50,120,60,0.08); }
-
-  /* FOOTER */
-  footer { padding: 16px 0 28px; display: flex; align-items: center; justify-content: space-between; opacity: 0.38; }
-  .footer-text { font-size: 9px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; color: var(--parchment); }
+  /* FOOTER HOME */
+  footer { padding: 16px 0 28px; display: flex; align-items: center; justify-content: space-between; opacity: 0.45; }
+  .footer-text { font-size: 9px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
   .footer-ornament { display: flex; gap: 4px; align-items: center; }
   .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--primary-glow); }
-
-  /* ═══════════════════════════════════════════════
-     BOTTOM SHEET
-  ═══════════════════════════════════════════════ */
-  .sheet-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(4,8,32,0); pointer-events: none; transition: background 300ms var(--ease-in-out); }
-  .sheet-overlay.open { background: rgba(4,8,32,0.86); pointer-events: auto; }
-  .sheet {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
-    background: linear-gradient(170deg, #060C28 0%, #0F2D6E 40%, #060C28 100%);
-    border-top: 1px solid rgba(46,107,224,0.4); border-radius: 16px 16px 0 0;
-    padding: 0 20px 32px; max-height: 92dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
-    transform: translateY(100%); transition: transform 380ms var(--ease-out);
-    box-shadow: 0 -8px 40px rgba(4,8,32,0.62), 0 -1px 0 rgba(46,107,224,0.20);
-  }
-  .sheet-overlay.open .sheet { transform: translateY(0); }
-  @media (min-width: 600px) {
-    .sheet { bottom: auto; top: 50%; left: 50%; right: auto; margin: 0; width: 440px; max-height: 90vh; border-radius: 8px; border: 1px solid rgba(46,107,224,0.4); opacity: 0; transform: translate(-50%, -44%) scale(0.96); transition: transform 320ms var(--ease-out), opacity 320ms var(--ease-out); }
-    .sheet-overlay.open .sheet { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    .sheet-handle { display: none; }
-  }
-  .sheet-handle { display: flex; justify-content: center; padding: 14px 0 0; cursor: pointer; }
-  .sheet-handle-bar { width: 36px; height: 3px; background: rgba(46,107,224,0.32); border-radius: 2px; }
-  .sheet-header { padding: 20px 0 16px; border-bottom: 1px solid rgba(46,107,224,0.25); margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; }
-  .sheet-title { font-family: var(--font-display); font-size: 30px; font-weight: 300; font-style: italic; color: var(--off-white); line-height: 1.15; }
-  .sheet-title strong { font-style: normal; font-weight: 600; display: block; font-size: 34px; }
-  .sheet-for { font-family: var(--font-body); font-size: 10px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(185,210,248,0.88); margin-top: 6px; }
-  .sheet-close { background: none; border: none; cursor: pointer; color: rgba(160,190,245,0.48); padding: 4px; transition: color 200ms; -webkit-tap-highlight-color: transparent; }
-  .sheet-close:hover { color: rgba(215,228,255,0.92); }
-
-  /* ── AJUSTE 3: formulário — fundo branco, texto preto, tipografia grossa ──
-     Só os campos de input mudam; sheet container e decorações permanecem.  */
-  .form-field { margin-bottom: 14px; }
-  .form-label {
-    display: block; font-family: var(--font-body);
-    font-size: 10px; font-weight: 600;
-    letter-spacing: 0.20em; text-transform: uppercase;
-    color: rgba(185,210,248,0.88); margin-bottom: 7px;
-  }
-  .form-input, .form-textarea {
-    width: 100%;
-    background: #ffffff;
-    border: 1.5px solid rgba(46,107,224,0.28);
-    border-radius: 4px;
-    padding: 12px 14px;
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 500;
-    color: #04102A;
-    outline: none;
-    transition: border-color 200ms, box-shadow 200ms;
-    -webkit-appearance: none; appearance: none;
-  }
-  .form-input::placeholder, .form-textarea::placeholder {
-    color: rgba(46,107,224,0.45);
-    font-weight: 400;
-  }
-  .form-input:focus, .form-textarea:focus {
-    border-color: #2E6BE0;
-    box-shadow: 0 0 0 3px rgba(46,107,224,0.10);
-    background: #fff;
-  }
-  .form-textarea { resize: none; height: 80px; line-height: 1.55; }
-  .service-chips-form { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-  /* ── AJUSTE 4: chips — estado padrão branco/neutro ── */
-  .service-chip-form {
-    font-family: var(--font-body); font-size: 15px; font-weight: 500;
-    color: rgba(195,215,252,0.92);
-    padding: 10px 20px;
-    border: 1.5px solid rgba(130,165,230,0.46);
-    border-radius: 2px; cursor: pointer;
-    background: rgba(160,192,250,0.07);
-    transition: all 180ms var(--ease-out);
-    -webkit-tap-highlight-color: transparent;
-  }
-  .service-chip-form:hover {
-    background: rgba(160,192,250,0.14);
-    border-color: rgba(130,165,230,0.72);
-    color: rgba(218,232,255,0.96);
-  }
-  /* ── AJUSTE 4: chip SELECIONADO → verde elegante ── */
-  .service-chip-form.selected {
-    background: rgba(34,140,74,0.18);
-    border-color: rgba(52,190,100,0.70);
-    color: rgba(80,230,130,0.95);
-    box-shadow: 0 0 10px rgba(40,180,80,0.12);
-  }
-
-  /* Campos de horário */
-  .form-hint {
-    font-family: var(--font-body); font-size: 12px; font-weight: 400;
-    color: rgba(180,210,245,0.80); line-height: 1.6; margin-bottom: 12px;
-  }
-  .time-opt-rows { display: flex; flex-direction: column; gap: 9px; }
-  .time-opt-row  { display: flex; flex-direction: column; gap: 4px; }
-  .time-opt-label { font-family: var(--font-body); font-size: 9.5px; font-weight: 600; letter-spacing: 0.20em; text-transform: uppercase; color: rgba(180,210,245,0.72); }
-  .time-opt-label .req     { color: rgba(160,190,245,0.90); }
-  .time-opt-label .opt-tag { color: rgba(130,162,218,0.55); font-weight: 400; }
-  .time-error { font-family: var(--font-body); font-size: 11.5px; font-weight: 500; color: rgba(255,110,125,0.95); margin-top: 5px; min-height: 14px; letter-spacing: 0.01em; }
-
-  /* SUBMIT */
-  .submit-btn {
-    width: 100%; padding: 16px;
-    background: linear-gradient(105deg, #1A52C0 0%, #2E6BE0 30%, #5E92F0 52%, #2E6BE0 72%, #1A52C0 100%);
-    background-size: 250% 100%; background-position: 100% 0;
-    border: 1px solid rgba(190,215,255,0.32); border-radius: 4px;
-    font-family: var(--font-body); font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
-    text-transform: uppercase; color: rgba(240,245,255,1); cursor: pointer;
-    transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out), background-position 600ms ease-in-out;
-    display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px;
-    box-shadow: 0 4px 20px rgba(46,107,224,0.44); -webkit-tap-highlight-color: transparent;
-    position: relative; overflow: hidden;
-  }
-  .submit-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(232,240,255,0.20) 0%, rgba(212,228,255,0.07) 38%, transparent 68%); opacity: 0.75; transition: opacity 300ms var(--ease-out); pointer-events: none; }
-  .submit-btn::after { content: ''; position: absolute; top: 0; left: -90%; width: 55%; height: 100%; background: linear-gradient(102deg, transparent 0%, rgba(232,240,255,0.10) 30%, rgba(238,245,255,0.22) 50%, rgba(232,240,255,0.10) 70%, transparent 100%); transform: skewX(-10deg); animation: gold-shimmer 7s cubic-bezier(0.4,0,0.6,1) infinite; animation-delay: 1.5s; opacity: 0.65; transition: opacity 400ms var(--ease-out); pointer-events: none; }
-  .submit-btn:active { transform: scale(0.982); box-shadow: 0 2px 10px rgba(15,30,110,0.24), inset 0 2px 6px rgba(10,18,95,0.14); }
-  .submit-btn:active::before { opacity: 0.40; } .submit-btn:active::after { opacity: 0.15; animation-play-state: paused; }
-  .submit-btn:hover::before { opacity: 1; } .submit-btn:hover::after { opacity: 1; }
-  .submit-btn:hover { border-color: rgba(205,222,255,0.54); box-shadow: 0 4px 24px rgba(94,146,240,0.55); background-position: 0% 0; }
 
   @keyframes gold-shimmer { 0%, 22% { left: -90%; } 72%, 100% { left: 180%; } }
 
@@ -490,46 +350,303 @@
   .anim-d3 { animation-delay: 240ms; }
   .anim-d4 { animation-delay: 330ms; }
   .anim-d5 { animation-delay: 420ms; }
-  .anim-d6 { animation-delay: 510ms; }
-  .anim-d7 { animation-delay: 600ms; }
 
-  /* ── DATA/HORA LADO A LADO ── */
-  .datetime-row {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
+  /* ═══════════════════════════════════════════════
+     SEGUNDA TELA — AGENDAMENTO (slide lateral)
+     fundo BRANCO de alta legibilidade
+  ═══════════════════════════════════════════════ */
+  .booking-screen {
+    position: fixed; inset: 0; z-index: 100;
+    background:
+      radial-gradient(ellipse 80% 60% at 60% 10%, rgba(190,215,255,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 10% 90%, rgba(14,38,110,0.45) 0%, transparent 55%),
+      linear-gradient(175deg, #070F30 0%, #0F2D6E 35%, #1A428C 65%, #070F30 100%);
+    transform: translateX(100%);
+    transition: transform 380ms var(--ease-out);
+    display: flex; flex-direction: column;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    visibility: hidden;
   }
-  .datetime-row .form-input.date-input { flex: 3; }
-  .datetime-row .form-input.time-input { flex: 2; }
-  @media (max-width: 340px) {
-    .datetime-row { flex-direction: column; }
-    .datetime-row .form-input.date-input,
-    .datetime-row .form-input.time-input { flex: none; width: 100%; }
+  .booking-screen.open {
+    transform: translateX(0);
+    visibility: visible;
   }
-  /* ── CAMPO COM ERRO ── */
-  .form-input.field-error {
-    border-color: rgba(220,70,90,0.70) !important;
-    box-shadow: 0 0 0 3px rgba(220,70,90,0.10) !important;
-    background: rgba(255,248,250,1) !important;
+
+  /* Header — integrado ao fundo azul */
+  .booking-header {
+    position: sticky; top: 0; z-index: 5;
+    padding: 14px 18px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    background: linear-gradient(180deg, rgba(7,15,48,0.92) 0%, rgba(15,45,110,0.78) 100%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(94,146,240,0.28);
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
   }
+  /* Botão voltar — alta visibilidade */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.10);
+    border: 1.5px solid rgba(255,255,255,0.45);
+    color: var(--text-strong);
+    font-family: var(--font-body);
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 9px 14px 9px 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 180ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+  .back-btn:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.7);
+  }
+  .back-btn:active { transform: scale(0.96); }
+  .back-btn svg { display: block; }
+  .booking-header-title {
+    flex: 1; min-width: 0;
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 600; font-style: italic;
+    color: var(--text-strong); letter-spacing: 0.02em;
+    line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .booking-header-pro {
+    font-family: var(--font-body);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-strong);
+    opacity: 0.85; flex-shrink: 0;
+  }
+
+  .booking-content {
+    flex: 1;
+    padding: 24px 20px 32px;
+    max-width: 540px; margin: 0 auto; width: 100%;
+  }
+
+  /* ─── Section heading (within form) ─── */
+  .booking-greeting {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 500; font-style: italic;
+    color: var(--form-ink);
+    line-height: 1.2; margin-bottom: 4px;
+  }
+  .booking-greeting strong {
+    font-style: normal; font-weight: 700; color: var(--form-ink);
+  }
+  .booking-sub {
+    font-family: var(--font-body);
+    font-size: 14px; font-weight: 500;
+    color: rgba(220, 232, 252, 0.88); line-height: 1.55;
+    margin-bottom: 26px;
+  }
+  .booking-sub strong { color: var(--text-strong); font-weight: 700; }
+
+  /* ─── Form fields ─── */
+  .form-field { margin-bottom: 20px; }
+  .form-label {
+    display: block; font-family: var(--font-body);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--form-ink); margin-bottom: 9px;
+  }
+  .form-label .req { color: var(--error); margin-left: 2px; }
+  .form-label .optional {
+    font-weight: 600; letter-spacing: 0.12em;
+    text-transform: none; color: var(--form-ink-soft);
+    font-size: 11px; margin-left: 6px;
+  }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--form-bg);
+    border: 1.5px solid var(--form-line);
+    border-radius: 6px;
+    padding: 13px 14px;
+    font-family: var(--font-body);
+    font-size: 16px; font-weight: 600;
+    color: var(--form-ink);
+    outline: none;
+    transition: border-color 180ms, box-shadow 180ms;
+    -webkit-appearance: none; appearance: none;
+    line-height: 1.4;
+  }
+  .form-input::placeholder, .form-textarea::placeholder {
+    color: rgba(180, 200, 235, 0.55); font-weight: 500;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--form-line-strong);
+    box-shadow: 0 0 0 3px rgba(94, 146, 240, 0.25);
+    background: rgba(8, 22, 60, 0.75);
+  }
+  .form-textarea { resize: none; height: 96px; line-height: 1.55; }
+
+  /* date/time inputs — calendário/picker nativo, sem digitação */
+  .form-input.date-input,
+  .form-input.time-input {
+    cursor: pointer;
+    color-scheme: dark; /* picker nativo em modo escuro */
+  }
+  /* Filtra o ícone nativo do picker para combinar com o tema azul */
+  .form-input.date-input::-webkit-calendar-picker-indicator,
+  .form-input.time-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.6);
+    opacity: 0.85;
+    cursor: pointer;
+  }
+  .form-input.date-input::-webkit-date-and-time-value,
+  .form-input.time-input::-webkit-date-and-time-value {
+    text-align: left;
+  }
+
+  /* select customizado */
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '';
+    position: absolute; right: 14px; top: 50%;
+    width: 9px; height: 9px;
+    border-right: 2px solid var(--form-line-strong);
+    border-bottom: 2px solid var(--form-line-strong);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+  .form-select {
+    cursor: pointer;
+    padding-right: 36px;
+    background-color: var(--form-bg);
+  }
+  .form-select option {
+    color: #FFFFFF;
+    background: #1A52C0;
+    font-weight: 600;
+  }
+  .form-select option:checked {
+    color: #FFFFFF;
+    background: #0F2D6E;
+  }
+
+  /* ─── Service chips — selecionado em VERDE SÓLIDO ─── */
+  .services-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .service-chip {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-body);
+    font-size: 14px; font-weight: 600;
+    color: var(--text-strong);
+    padding: 10px 16px;
+    border: 1.5px solid rgba(180, 205, 245, 0.40);
+    border-radius: 999px;
+    background: rgba(20, 50, 110, 0.45);
+    cursor: pointer;
+    transition: all 160ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1;
+  }
+  .service-chip:hover {
+    border-color: rgba(180, 205, 245, 0.75);
+    background: rgba(35, 75, 145, 0.55);
+  }
+  .service-chip.selected {
+    /* CORES SÓLIDAS — sem rgba/transparência */
+    background: #1F9D55;
+    border-color: #167A40;
+    color: #FFFFFF;
+    padding-right: 14px;
+    box-shadow: 0 2px 12px rgba(31, 157, 85, 0.35);
+  }
+  .service-chip .chip-x {
+    display: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.25);
+    font-size: 11px; font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1;
+  }
+  .service-chip.selected .chip-x { display: inline-flex; }
+
+  /* ─── Time options ─── */
+  .time-options { display: flex; flex-direction: column; gap: 12px; }
+  .time-option-row {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 14px;
+    border: 1.5px solid var(--form-line);
+    border-radius: 8px;
+    background: var(--form-surface);
+  }
+  .time-option-row.is-required { border-left: 3px solid var(--form-line-strong); }
+  .time-option-label {
+    font-family: var(--font-body);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--form-ink);
+  }
+  .time-option-label .req { color: var(--error); margin-left: 2px; }
+  .time-option-label .opt {
+    font-weight: 600; letter-spacing: 0.10em; text-transform: none;
+    color: var(--form-ink-soft); font-size: 11px; margin-left: 6px;
+  }
+  .datetime-grid {
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px;
+  }
+  @media (max-width: 360px) {
+    .datetime-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Erros ─── */
+  .form-error {
+    font-family: var(--font-body); font-size: 13px; font-weight: 600;
+    color: var(--error); margin-top: 10px; min-height: 18px;
+  }
+  .form-input.field-error,
+  .form-select.field-error {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 3px rgba(217, 58, 79, 0.20) !important;
+    background: rgba(80, 20, 30, 0.35) !important;
+  }
+
+  /* ─── Submit ─── */
+  .submit-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(105deg, #1A52C0 0%, #2E6BE0 30%, #5E92F0 52%, #2E6BE0 72%, #1A52C0 100%);
+    background-size: 250% 100%; background-position: 100% 0;
+    border: 1px solid rgba(40, 80, 180, 0.45);
+    border-radius: 6px;
+    font-family: var(--font-body); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-strong); cursor: pointer;
+    transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out), background-position 600ms ease-in-out;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 24px;
+    box-shadow: 0 4px 18px rgba(46,107,224,0.36);
+    -webkit-tap-highlight-color: transparent;
+    position: relative; overflow: hidden;
+  }
+  .submit-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(232,240,255,0.20) 0%, rgba(212,228,255,0.07) 38%, transparent 68%);
+    opacity: 0.75; pointer-events: none;
+  }
+  .submit-btn:hover { background-position: 0% 0; box-shadow: 0 6px 22px rgba(94,146,240,0.48); }
+  .submit-btn:active { transform: scale(0.985); }
+
+  .booking-footer {
+    text-align: center; padding: 14px 20px 8px;
+    font-family: var(--font-body); font-size: 12px;
+    color: rgba(200, 215, 245, 0.75); font-weight: 500;
+  }
+  .booking-footer strong { color: var(--text-strong); font-weight: 700; }
 </style>
 </head>
 <body>
 
 <div class="hero-bg"></div>
-<!-- fundo limpo: sem imagem global -->
 
-<!--
-  SVG CLIP DEFINITION — não renderiza nada.
-  clipPathUnits="objectBoundingBox": coordenadas 0-1
-  que escalam com a largura/altura do .cover-section.
-
-  Path equivale ao bridge "M 0 0 Q 50 40 100 0" (viewBox 100×20):
-    0.9024  = 185/205  — bridge top nas bordas do cover
-    1.0976  = ctrl-Cy  — calculado para dip exato em y=1.0 (205px)
--->
-<svg width="0" height="0" aria-hidden="true"
-     style="position:absolute;overflow:hidden;pointer-events:none">
+<svg width="0" height="0" aria-hidden="true" style="position:absolute;overflow:hidden;pointer-events:none">
   <defs>
     <clipPath id="coverClip" clipPathUnits="objectBoundingBox">
       <path d="M 0 0 L 1 0 L 1 0.9024 Q 0.5 1.0976 0 0.9024 Z"/>
@@ -537,33 +654,20 @@
   </defs>
 </svg>
 
+<!-- ════════════════ HOME ════════════════ -->
 <main>
 
-  <!-- COVER — overflow:hidden + border-radius recorta a imagem na curva -->
   <div class="cover-section anim anim-d1">
-    <!-- Imagem: visível, sem overlay vermelho, recortada pela curva via overflow:hidden -->
     <div class="cover-section-img"></div>
-    <!-- Vinheta mínima: apenas integra as bordas ao fundo, sem camada de cor -->
     <div class="cover-section-vignette"></div>
   </div>
 
-  <!--
-    PROFILE JUNCTION
-    SVG único, full-width, arco contínuo.
-    A linha bridge-base marca o limite inferior exato do cover.
-  -->
   <div class="profile-junction anim anim-d2">
-
-    <svg class="bridge-svg"
-         viewBox="0 0 100 20"
-         preserveAspectRatio="none"
-         xmlns="http://www.w3.org/2000/svg"
-         aria-hidden="true">
+    <svg class="bridge-svg" viewBox="0 0 100 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path class="bridge-base"    d="M 0 0 Q 50 40 100 0"/>
       <path class="bridge-shine-l" d="M 0 0 Q 50 40 100 0"/>
       <path class="bridge-shine-r" d="M 100 0 Q 50 40 0 0"/>
     </svg>
-
     <div class="profile-logo-circle" aria-hidden="true">
       <svg width="58" height="58" viewBox="0 0 28 28" fill="none">
         <path d="M14 2L15.8 8.4L22 6.8L18.2 12L22 17.2L15.8 15.6L14 22L12.2 15.6L6 17.2L9.8 12L6 6.8L12.2 8.4Z"
@@ -572,10 +676,8 @@
         <circle cx="14" cy="12" r="1.1" fill="rgba(94,146,240,0.74)"/>
       </svg>
     </div>
-
   </div>
 
-  <!-- IDENTIDADE -->
   <div class="profile-identity-text anim anim-d3">
     <h1 class="profile-studio-name">Nail Studio</h1>
     <p class="profile-tagline">
@@ -584,33 +686,30 @@
     </p>
   </div>
 
-  <!-- DIVISÓRIA -->
   <div class="section-divider anim anim-d4">
     <div class="divider-line"></div>
     <div class="divider-diamond"></div>
     <div class="divider-line" style="background:linear-gradient(90deg,rgba(10,22,75,0.2),rgba(46,107,224,0.5))"></div>
   </div>
 
-  <!-- BOTÕES -->
   <div class="professionals anim anim-d5">
 
     <a class="insta-btn" href="https://instagram.com/atelierdasmaos" target="_blank" rel="noopener" aria-label="Instagram">
-      <div class="insta-btn-glow"></div>
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="rgba(255,240,250,0.85)" stroke-width="1.6"/>
-        <circle cx="12" cy="12" r="4.2" stroke="rgba(255,240,250,0.85)" stroke-width="1.6"/>
-        <circle cx="17.2" cy="6.8" r="1.1" fill="rgba(255,240,250,0.85)"/>
+        <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="#FFF0F8" stroke-width="1.7"/>
+        <circle cx="12" cy="12" r="4.2" stroke="#FFF0F8" stroke-width="1.7"/>
+        <circle cx="17.2" cy="6.8" r="1.1" fill="#FFF0F8"/>
       </svg>
       <div class="insta-label">
         <div class="insta-role">Nos siga no</div>
         <div class="insta-name">@atelierdasmaos</div>
       </div>
       <svg class="pro-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M6 3L11 8L6 13" stroke="rgba(255,220,240,0.75)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 3L11 8L6 13" stroke="#FFF0F8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
 
-    <button class="pro-btn" onclick="openSheet('leticia')" aria-label="Agendar com Letícia">
+    <button class="pro-btn" onclick="openBooking('leticia')" aria-label="Agendar com Letícia">
       <div class="glow-ring"></div>
       <div class="pro-avatar-placeholder"><span>L</span></div>
       <div class="pro-info">
@@ -619,11 +718,11 @@
         <div class="pro-action">Agendar pelo WhatsApp</div>
       </div>
       <svg class="pro-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M6 3L11 8L6 13" stroke="rgba(215,228,255,0.72)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 3L11 8L6 13" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
 
-    <button class="pro-btn" onclick="openSheet('maria')" aria-label="Agendar com Maria">
+    <button class="pro-btn" onclick="openBooking('maria')" aria-label="Agendar com Maria">
       <div class="glow-ring"></div>
       <div class="pro-avatar-placeholder"><span>M</span></div>
       <div class="pro-info">
@@ -632,49 +731,13 @@
         <div class="pro-action">Agendar pelo WhatsApp</div>
       </div>
       <svg class="pro-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M6 3L11 8L6 13" stroke="rgba(215,228,255,0.72)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 3L11 8L6 13" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
+
   </div>
 
-  <!-- SERVIÇOS -->
-  <div class="services-section anim anim-d6">
-    <div class="services-label">Serviços</div>
-    <div class="services-chips">
-      <span class="chip">Unhas em Gel</span>
-      <span class="chip">Fibra de Vidro</span>
-      <span class="chip">Manutenção</span>
-      <span class="chip">Nail Art</span>
-      <span class="chip">Esmaltação</span>
-      <span class="chip">Remoção</span>
-      <span class="chip">Cutículas</span>
-    </div>
-  </div>
-
-  <div class="section-divider anim anim-d6">
-    <div class="divider-line"></div>
-    <div class="divider-diamond"></div>
-    <div class="divider-line" style="background:linear-gradient(90deg,rgba(10,22,75,0.2),rgba(46,107,224,0.5))"></div>
-  </div>
-
-  <!-- LOCALIZAÇÃO -->
-  <div class="location-section anim anim-d7">
-    <div class="location-label">Localização</div>
-    <div class="location-row">
-      <div class="location-address">
-        Rua das Flores, 214<br>Sala 03 — Centro<br>João Pessoa, PB
-      </div>
-      <button class="copy-btn" onclick="copyAddress(this)" aria-label="Copiar endereço">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.1"/>
-          <path d="M3 8H2C1.45 8 1 7.55 1 7V2C1 1.45 1.45 1 2 1H7C7.55 1 8 1.45 8 2V3" stroke="currentColor" stroke-width="1.1"/>
-        </svg>
-        <span class="copy-text">Copiar</span>
-      </button>
-    </div>
-  </div>
-
-  <footer class="anim anim-d7">
+  <footer class="anim anim-d5">
     <span class="footer-text">© 2025 Atelier das Mãos</span>
     <div class="footer-ornament">
       <div class="footer-dot"></div>
@@ -685,242 +748,322 @@
 
 </main>
 
-<!-- BOTTOM SHEET -->
-<div class="sheet-overlay" id="sheetOverlay" onclick="handleOverlayClick(event)">
-  <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+<!-- ════════════════ SEGUNDA TELA — AGENDAMENTO ════════════════ -->
+<section class="booking-screen" id="bookingScreen" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
 
-    <div class="sheet-handle" onclick="closeSheet()">
-      <div class="sheet-handle-bar"></div>
-    </div>
+  <header class="booking-header">
+    <button class="back-btn" onclick="closeBooking()" aria-label="Voltar para a página inicial">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Voltar
+    </button>
+    <div class="booking-header-title" id="bookingTitle">Agendamento</div>
+    <div class="booking-header-pro" id="bookingHeaderPro">Letícia</div>
+  </header>
 
-    <div class="sheet-header">
-      <div>
-        <div class="sheet-title">Agendar<br><strong>Horário</strong></div>
-        <div class="sheet-for" id="sheetFor">com Letícia</div>
-      </div>
-      <button class="sheet-close" onclick="closeSheet()" aria-label="Fechar">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
+  <div class="booking-content">
+
+    <h2 class="booking-greeting">Vamos <strong>agendar</strong></h2>
+    <p class="booking-sub">
+      Preencha os campos abaixo e enviaremos sua solicitação direto para o WhatsApp da profissional.
+    </p>
 
     <!-- Nome -->
     <div class="form-field">
-      <label class="form-label" for="clientName">Seu nome</label>
-      <input class="form-input" id="clientName" type="text" placeholder="Como prefere ser chamada?">
+      <label class="form-label" for="clientName">Seu nome <span class="req">*</span></label>
+      <input class="form-input" id="clientName" type="text" placeholder="Como prefere ser chamada?" autocomplete="name">
     </div>
 
     <!-- Serviço -->
     <div class="form-field">
-      <label class="form-label">Serviço desejado</label>
-      <div class="service-chips-form">
-        <button class="service-chip-form" onclick="selectChip(this)">Unhas em Gel</button>
-        <button class="service-chip-form" onclick="selectChip(this)">Fibra de Vidro</button>
-        <button class="service-chip-form" onclick="selectChip(this)">Manutenção</button>
-        <button class="service-chip-form" onclick="selectChip(this)">Nail Art</button>
-        <button class="service-chip-form" onclick="selectChip(this)">Esmaltação</button>
-        <button class="service-chip-form" onclick="selectChip(this)">Remoção</button>
-        <button class="service-chip-form" onclick="selectChip(this)">Cutículas</button>
+      <label class="form-label">Serviço desejado <span class="optional">(escolha 1 ou mais)</span></label>
+      <div class="services-grid" id="servicesGrid">
+        <button class="service-chip" type="button" onclick="toggleService(this)">Unhas em Gel<span class="chip-x">×</span></button>
+        <button class="service-chip" type="button" onclick="toggleService(this)">Fibra de Vidro<span class="chip-x">×</span></button>
+        <button class="service-chip" type="button" onclick="toggleService(this)">Manutenção<span class="chip-x">×</span></button>
+        <button class="service-chip" type="button" onclick="toggleService(this)">Nail Art<span class="chip-x">×</span></button>
+        <button class="service-chip" type="button" onclick="toggleService(this)">Esmaltação<span class="chip-x">×</span></button>
+        <button class="service-chip" type="button" onclick="toggleService(this)">Remoção<span class="chip-x">×</span></button>
+        <button class="service-chip" type="button" onclick="toggleService(this)">Cutículas<span class="chip-x">×</span></button>
       </div>
-      <input class="form-input" id="serviceInput" type="text" placeholder="Ou descreva aqui..." style="margin-top:0">
     </div>
 
-    <!-- Horários — data e hora separados -->
+    <!-- Horários -->
     <div class="form-field">
       <label class="form-label">Datas e horários de preferência</label>
-      <p class="form-hint">
-        Informe até 3 opções. Campos <span style="color:rgba(160,190,245,0.90)">*</span> são obrigatórios.<br>
-        <strong style="color:rgba(160,190,245,0.85)">Exemplo: 01/05/2026 &nbsp;|&nbsp; 18h</strong>
+      <p class="booking-sub" style="margin-bottom:14px; font-size:13px;">
+        Apenas a <strong>1ª opção</strong> é obrigatória. Atendemos de <strong>seg. a sáb.</strong>, das <strong>08h às 19h</strong>.
       </p>
-      <div class="time-opt-rows">
-        <div class="time-opt-row">
-          <span class="time-opt-label">1ª opção <span class="req">*</span></span>
-          <div class="datetime-row">
-            <input class="form-input date-input" id="date1" type="text" inputmode="numeric"
-                   placeholder="DD/MM/AAAA" oninput="formatDate(this)">
-            <input class="form-input time-input" id="time1" type="text" inputmode="numeric"
-                   placeholder="Ex: 18h" oninput="formatTime(this)">
+
+      <div class="time-options">
+
+        <div class="time-option-row is-required">
+          <span class="time-option-label">1ª opção <span class="req">*</span></span>
+          <div class="datetime-grid">
+            <input class="form-input date-input"
+                   id="date1" type="date"
+                   onkeydown="return false" onpaste="return false"
+                  
+                   placeholder="Clique para escolher a data">
+            <div class="select-wrap">
+              <select class="form-select" id="time1">
+                <option value="">Clique para escolher</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="time-opt-row">
-          <span class="time-opt-label">2ª opção <span class="req">*</span></span>
-          <div class="datetime-row">
-            <input class="form-input date-input" id="date2" type="text" inputmode="numeric"
-                   placeholder="DD/MM/AAAA" oninput="formatDate(this)">
-            <input class="form-input time-input" id="time2" type="text" inputmode="numeric"
-                   placeholder="Ex: 14h30" oninput="formatTime(this)">
+
+        <div class="time-option-row">
+          <span class="time-option-label">2ª opção <span class="opt">(opcional)</span></span>
+          <div class="datetime-grid">
+            <input class="form-input date-input"
+                   id="date2" type="date"
+                   onkeydown="return false" onpaste="return false"
+                  
+                   placeholder="Clique para escolher a data">
+            <div class="select-wrap">
+              <select class="form-select" id="time2">
+                <option value="">Clique para escolher</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="time-opt-row">
-          <span class="time-opt-label">3ª opção <span class="opt-tag">(opcional)</span></span>
-          <div class="datetime-row">
-            <input class="form-input date-input" id="date3" type="text" inputmode="numeric"
-                   placeholder="DD/MM/AAAA" oninput="formatDate(this)">
-            <input class="form-input time-input" id="time3" type="text" inputmode="numeric"
-                   placeholder="Ex: 10h" oninput="formatTime(this)">
+
+        <div class="time-option-row">
+          <span class="time-option-label">3ª opção <span class="opt">(opcional)</span></span>
+          <div class="datetime-grid">
+            <input class="form-input date-input"
+                   id="date3" type="date"
+                   onkeydown="return false" onpaste="return false"
+                  
+                   placeholder="Clique para escolher a data">
+            <div class="select-wrap">
+              <select class="form-select" id="time3">
+                <option value="">Clique para escolher</option>
+              </select>
+            </div>
           </div>
         </div>
+
       </div>
-      <div class="time-error" id="timeError" role="alert"></div>
+
+      <div class="form-error" id="timeError" role="alert"></div>
     </div>
 
     <!-- Observações -->
     <div class="form-field">
-      <label class="form-label" for="notes">Observações</label>
-      <textarea class="form-textarea" id="notes" placeholder="Referência de nail art, informações extras..."></textarea>
+      <label class="form-label" for="notes">Observações <span class="optional">(opcional)</span></label>
+      <textarea class="form-textarea" id="notes"
+                placeholder="Referência de nail art, formato preferido, alergias, etc."></textarea>
     </div>
 
     <button class="submit-btn" onclick="sendWhatsApp()">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" fill="rgba(232,240,255,0.95)"/>
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
+              fill="#FFFFFF"/>
       </svg>
       Enviar pelo WhatsApp
     </button>
 
+    <p class="booking-footer">
+      Você falará com a profissional pelo WhatsApp <strong>(83) 99181-6152</strong>.
+    </p>
+
   </div>
-</div>
+</section>
 
 <script>
-  let currentPro = 'leticia';
-  const phones = { leticia: '5583999999991', maria: '5583999999992' };
-  const names  = { leticia: 'Letícia',        maria: 'Maria'         };
+'use strict';
 
-  function openSheet(pro) {
-    currentPro = pro;
-    document.getElementById('sheetFor').textContent = 'com ' + names[pro];
-    document.getElementById('sheetOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('clientName').focus(), 420);
+const proData = {
+  leticia: { name: 'Letícia', phone: '5583991816152' },
+  maria:   { name: 'Maria',   phone: '5583991816152' }
+};
+
+let currentPro = 'leticia';
+
+/* ── Abrir / Fechar segunda tela ── */
+function openBooking(pro) {
+  currentPro = pro;
+  document.getElementById('bookingHeaderPro').textContent = proData[pro].name;
+  document.getElementById('bookingScreen').classList.add('open');
+  document.body.classList.add('no-scroll');
+  setupDateLimits();
+  populateTimes();
+  // Scroll inicial topo
+  document.getElementById('bookingScreen').scrollTop = 0;
+}
+
+function closeBooking() {
+  document.getElementById('bookingScreen').classList.remove('open');
+  document.body.classList.remove('no-scroll');
+  document.getElementById('timeError').textContent = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('bookingScreen').classList.contains('open')) {
+    closeBooking();
   }
-  function closeSheet() {
-    document.getElementById('sheetOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function handleOverlayClick(e) {
-    if (e.target === document.getElementById('sheetOverlay')) closeSheet();
-  }
+});
 
-  function selectChip(el) {
-    el.classList.toggle('selected');
-  }
+/* ── Botões hardware-back (mobile) ── */
+window.addEventListener('popstate', () => {
+  if (document.getElementById('bookingScreen').classList.contains('open')) closeBooking();
+});
 
-  /* ── Formata data: DD/MM/AAAA ── */
-  function formatDate(input) {
-    const d = input.value.replace(/\D/g,'').slice(0,8);
-    if (!d) { input.value = ''; return; }
-    let out = d;
-    if (d.length > 2) out = d.slice(0,2) + '/' + d.slice(2);
-    if (d.length > 4) out = d.slice(0,2) + '/' + d.slice(2,4) + '/' + d.slice(4);
-    input.value = out;
-    input.classList.remove('field-error');
-  }
+/* ── Service chips: toggle ── */
+function toggleService(btn) {
+  btn.classList.toggle('selected');
+}
 
-  /* ── Formata hora: HHh ou HHhMM ── */
-  function formatTime(input) {
-    const d = input.value.replace(/\D/g,'').slice(0,4);
-    if (!d) { input.value = ''; return; }
-    let out = d.length <= 2 ? d : d.slice(0,2) + 'h' + d.slice(2);
-    if (d.length === 2) out = d + 'h';
-    input.value = out;
-    input.classList.remove('field-error');
-  }
+/* ── Limites de data: hoje em diante, sem domingos ── */
+function todayISO() {
+  // Local date (timezone do navegador) — formato YYYY-MM-DD
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
-  function validateTimes() {
-    const err = document.getElementById('timeError');
-    ['date1','time1','date2','time2','date3','time3'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('field-error');
-    });
-
-    const d1 = document.getElementById('date1').value.trim();
-    const t1 = document.getElementById('time1').value.trim();
-    const d2 = document.getElementById('date2').value.trim();
-    const t2 = document.getElementById('time2').value.trim();
-    const d3 = document.getElementById('date3').value.trim();
-    const t3 = document.getElementById('time3').value.trim();
-
-    const markErr = (msg, ...ids) => {
-      err.textContent = msg;
-      ids.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('field-error'); });
-      return false;
-    };
-
-    if (!d1) return markErr('Por favor, preencha a data da 1ª opção.', 'date1');
-    if (!t1) return markErr('Por favor, preencha o horário da 1ª opção.', 'time1');
-    if (!d2) return markErr('Por favor, preencha a data da 2ª opção.', 'date2');
-    if (!t2) return markErr('Por favor, preencha o horário da 2ª opção.', 'time2');
-
-    const dateRe = /^\d{2}\/\d{2}\/\d{4}$/;
-    const timeRe = /^\d{1,2}h(\d{2})?$/i;
-
-    if (!dateRe.test(d1)) return markErr('Data da 1ª opção inválida. Use DD/MM/AAAA', 'date1');
-    if (!timeRe.test(t1)) return markErr('Horário da 1ª opção inválido. Ex: 18h ou 18h30', 'time1');
-    if (!dateRe.test(d2)) return markErr('Data da 2ª opção inválida. Use DD/MM/AAAA', 'date2');
-    if (!timeRe.test(t2)) return markErr('Horário da 2ª opção inválido. Ex: 18h ou 18h30', 'time2');
-
-    if (d3 && !t3) return markErr('Por favor, preencha o horário da 3ª opção.', 'time3');
-    if (!d3 && t3) return markErr('Por favor, preencha a data da 3ª opção.', 'date3');
-    if (d3 && t3) {
-      if (!dateRe.test(d3)) return markErr('Data da 3ª opção inválida. Use DD/MM/AAAA', 'date3');
-      if (!timeRe.test(t3)) return markErr('Horário da 3ª opção inválido. Ex: 18h ou 18h30', 'time3');
-    }
-
-    const k1 = d1+t1, k2 = d2+t2, k3 = (d3&&t3) ? d3+t3 : null;
-    if (k1===k2) return markErr('1ª e 2ª opção têm o mesmo horário.','date1','time1','date2','time2');
-    if (k3&&k1===k3) return markErr('1ª e 3ª opção têm o mesmo horário.');
-    if (k3&&k2===k3) return markErr('2ª e 3ª opção têm o mesmo horário.');
-
-    err.textContent = '';
-    return { v1: d1+' às '+t1, v2: d2+' às '+t2, v3: k3 ? d3+' às '+t3 : null };
-  }
-
-  function sendWhatsApp() {
-    const times = validateTimes();
-    if (!times) return;
-
-    const name = document.getElementById('clientName').value.trim();
-    const chipsSel = [...document.querySelectorAll('.service-chip-form.selected')].map(c => c.textContent.trim()).join(', ');
-    const serviceManual = document.getElementById('serviceInput').value.trim();
-    const service = [chipsSel, serviceManual].filter(Boolean).join(' + ');
-    const notes = document.getElementById('notes').value.trim();
-
-    let msg = `Olá, ${names[currentPro]}! 🌸\n\nGostaria de agendar um horário.`;
-    if (name)    msg += `\n\n*Nome:* ${name}`;
-    if (service) msg += `\n*Serviço:* ${service}`;
-    msg += `\n\n*Opções de horário:*\n  1ª: ${times.v1}\n  2ª: ${times.v2}`;
-    if (times.v3) msg += `\n  3ª: ${times.v3}`;
-    if (notes)   msg += `\n\n*Obs:* ${notes}`;
-
-    window.open(`https://wa.me/${phones[currentPro]}?text=${encodeURIComponent(msg)}`, '_blank');
-    closeSheet();
-  }
-
-  function copyAddress(btn) {
-    const addr = 'Rua das Flores, 214 — Sala 03, Centro, João Pessoa, PB';
-    const span = btn.querySelector('.copy-text');
-    const done = () => {
-      btn.classList.add('copied'); span.textContent = 'Copiado ✓';
-      setTimeout(() => { btn.classList.remove('copied'); span.textContent = 'Copiar'; }, 2200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(addr).then(done);
-    else { const t = document.createElement('textarea'); t.value = addr; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); done(); }
-  }
-
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
-
-  let startY = 0;
-  const sheet = document.getElementById('sheet');
-  sheet.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
-  sheet.addEventListener('touchmove', e => {
-    if (sheet.scrollTop > 0) return;
-    const dy = e.touches[0].clientY - startY;
-    if (dy > 0) { sheet.style.transform = `translateY(${Math.min(dy*0.6,180)}px)`; sheet.style.transition = 'none'; }
-  }, { passive: true });
-  sheet.addEventListener('touchend', e => {
-    sheet.style.transition = ''; sheet.style.transform = '';
-    if (sheet.scrollTop === 0 && e.changedTouches[0].clientY - startY > 90) closeSheet();
+function setupDateLimits() {
+  const min = todayISO();
+  ['date1','date2','date3'].forEach(id => {
+    const el = document.getElementById(id);
+    el.min = min;
+    el.addEventListener('change', validateNoSunday);
+    // Clicar em qualquer lugar da caixa abre o calendário nativo
+    el.addEventListener('click', openPicker);
+    el.addEventListener('focus', openPicker);
   });
+}
+
+function openPicker(e) {
+  const el = e.currentTarget;
+  // showPicker() é o método correto pra forçar abertura do calendário
+  // (suportado em Chrome/Edge/Safari/Firefox modernos)
+  if (typeof el.showPicker === 'function') {
+    try { el.showPicker(); } catch (_) { /* alguns navegadores exigem gesto direto */ }
+  }
+}
+
+function validateNoSunday(e) {
+  const val = e.target.value;
+  if (!val) return;
+  const [y, m, d] = val.split('-').map(Number);
+  const dt = new Date(y, m - 1, d); // local
+  if (dt.getDay() === 0) {
+    showFieldError(e.target.id, 'Não atendemos aos domingos. Por favor, escolha outro dia.');
+    e.target.value = '';
+  } else {
+    clearFieldError(e.target.id);
+  }
+}
+
+/* ── Horários: 08:00 → 19:00 a cada 30min ── */
+function populateTimes() {
+  const opts = ['<option value="">Clique para escolher</option>'];
+  for (let h = 8; h <= 19; h++) {
+    const hh = String(h).padStart(2, '0');
+    opts.push(`<option value="${hh}:00">${hh}:00</option>`);
+    if (h < 19) opts.push(`<option value="${hh}:30">${hh}:30</option>`);
+  }
+  const html = opts.join('');
+  ['time1','time2','time3'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (sel.options.length <= 1) sel.innerHTML = html;
+  });
+}
+
+/* ── Erros ── */
+function showFieldError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('field-error');
+  document.getElementById('timeError').textContent = msg;
+}
+function clearFieldError(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('field-error');
+}
+function clearAllErrors() {
+  ['clientName','date1','time1','date2','time2','date3','time3']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('field-error'); });
+  document.getElementById('timeError').textContent = '';
+}
+
+/* ── Formatação de data BR ── */
+function formatBR(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+/* ── Validação completa ── */
+function validateForm() {
+  clearAllErrors();
+  const errEl = document.getElementById('timeError');
+
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) {
+    document.getElementById('clientName').classList.add('field-error');
+    document.getElementById('clientName').focus();
+    errEl.textContent = 'Por favor, informe seu nome.';
+    return null;
+  }
+
+  const d1 = document.getElementById('date1').value;
+  const t1 = document.getElementById('time1').value;
+  const d2 = document.getElementById('date2').value;
+  const t2 = document.getElementById('time2').value;
+  const d3 = document.getElementById('date3').value;
+  const t3 = document.getElementById('time3').value;
+
+  if (!d1) { showFieldError('date1', 'Por favor, escolha a data da 1ª opção.'); return null; }
+  if (!t1) { showFieldError('time1', 'Por favor, escolha o horário da 1ª opção.'); return null; }
+
+  // 2ª e 3ª: se uma parte preenchida, exigir a outra
+  if (d2 && !t2) { showFieldError('time2', 'Escolha o horário da 2ª opção (ou limpe a data).'); return null; }
+  if (!d2 && t2) { showFieldError('date2', 'Escolha a data da 2ª opção (ou limpe o horário).'); return null; }
+  if (d3 && !t3) { showFieldError('time3', 'Escolha o horário da 3ª opção (ou limpe a data).'); return null; }
+  if (!d3 && t3) { showFieldError('date3', 'Escolha a data da 3ª opção (ou limpe o horário).'); return null; }
+
+  // Duplicidade
+  const k1 = d1 + 'T' + t1;
+  const k2 = (d2 && t2) ? d2 + 'T' + t2 : null;
+  const k3 = (d3 && t3) ? d3 + 'T' + t3 : null;
+  if (k2 && k1 === k2) { showFieldError('date2', '1ª e 2ª opção têm a mesma data e horário.'); return null; }
+  if (k3 && k1 === k3) { showFieldError('date3', '1ª e 3ª opção têm a mesma data e horário.'); return null; }
+  if (k2 && k3 && k2 === k3) { showFieldError('date3', '2ª e 3ª opção têm a mesma data e horário.'); return null; }
+
+  return {
+    name,
+    opt1: `${formatBR(d1)} às ${t1}`,
+    opt2: k2 ? `${formatBR(d2)} às ${t2}` : null,
+    opt3: k3 ? `${formatBR(d3)} às ${t3}` : null
+  };
+}
+
+/* ── Envio WhatsApp ── */
+function sendWhatsApp() {
+  const data = validateForm();
+  if (!data) return;
+
+  const services = [...document.querySelectorAll('.service-chip.selected')]
+    .map(c => c.firstChild.textContent.trim()).join(', ');
+  const notes = document.getElementById('notes').value.trim();
+
+  let msg = `Olá, ${proData[currentPro].name}! 🌸\n\nGostaria de agendar um horário.`;
+  msg += `\n\n*Nome:* ${data.name}`;
+  if (services) msg += `\n*Serviço:* ${services}`;
+  msg += `\n\n*Opções de horário:*\n  1ª: ${data.opt1}`;
+  if (data.opt2) msg += `\n  2ª: ${data.opt2}`;
+  if (data.opt3) msg += `\n  3ª: ${data.opt3}`;
+  if (notes) msg += `\n\n*Obs:* ${notes}`;
+
+  const url = `https://wa.me/${proData[currentPro].phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank', 'noopener');
+}
 </script>
 
 </body>
