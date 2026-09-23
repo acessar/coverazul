@@ -16,8 +16,17 @@
     --text-on-blue:#f4f7f1;
     --vh:1vh;
     --card-max:420px;
+
+    /* ===== positioning system =====
+       --hill-top is the SINGLE source of truth for where the colored
+       area begins. Both the cream pattern band and the blue hill read
+       from this same variable, so they can never drift apart.
+       --top-gap (content padding-top) is derived from it so the logo
+       always sits centered on that line, unless a breakpoint below
+       explicitly overrides --top-gap to push content further down. */
     --logo-d:clamp(112px,30vw,140px);
-    --top-gap:clamp(90px,16vh,140px);
+    --hill-top:clamp(190px,30vh,250px);
+    --top-gap:calc(var(--hill-top) - (var(--logo-d) / 2));
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
@@ -48,7 +57,7 @@
   .pattern{
     position:absolute;
     inset:0;
-    height:42%;
+    height:var(--hill-top);
     background-color:var(--cream);
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120'%3E%3Ctext x='-30' y='35' font-family='Georgia,serif' font-size='16' fill='%23dde6e3' transform='rotate(-18 120 60)'%3ELI%20MONT%20LI%20MONT%20LI%20MONT%3C/text%3E%3Ctext x='-30' y='95' font-family='Georgia,serif' font-size='16' fill='%23dde6e3' transform='rotate(-18 120 60)'%3ELI%20MONT%20LI%20MONT%20LI%20MONT%3C/text%3E%3C/svg%3E");
     background-repeat:repeat;
@@ -57,7 +66,7 @@
     position:absolute;
     left:-18%;
     right:-18%;
-    top:calc(var(--top-gap) + (var(--logo-d) / 2));
+    top:var(--hill-top);
     bottom:0;
     background:var(--blue-deep);
     border-radius:50% 50% 0 0/16% 16% 0 0;
@@ -155,7 +164,8 @@
   @media (min-width:601px){
     :root{
       --logo-d:clamp(96px,20vw,120px);
-      --top-gap:clamp(120px,20vh,170px);
+      --hill-top:clamp(215px,28vh,260px);
+      --top-gap:calc(var(--hill-top) - (var(--logo-d) / 2));
     }
     body{
       align-items:center;
@@ -180,7 +190,14 @@
   @media (min-width:1024px){
     :root{
       --card-max:440px;
-      --top-gap:clamp(150px,20vh,210px);
+      /* on desktop the colored area starts a bit earlier (more blue,
+         less cream) and the content is deliberately pushed further
+         down INTO that colored area, instead of the logo straddling
+         the line as it does on mobile/tablet — this is what creates
+         the extra breathing room between the top of the blue area
+         and the actual content. */
+      --hill-top:clamp(150px,20vh,190px);
+      --top-gap:clamp(190px,22vh,250px);
     }
     body{padding:64px 40px;position:relative;overflow-x:hidden;}
     body::before{
@@ -199,7 +216,7 @@
     .page{position:relative;z-index:1;}
     .card{box-shadow:0 40px 90px rgba(20,30,28,.32);}
     .content{min-height:660px;}
-    .logo{margin-bottom:clamp(60px,9vh,84px);}
+    .logo{margin-bottom:clamp(56px,9vh,80px);}
 
     /* a little bigger on desktop: socials, avatars and the link buttons */
     .socials{gap:22px;margin-bottom:40px;}
@@ -230,7 +247,7 @@
       <div class="pattern"></div>
       <div class="hill"></div>
       <div class="content">
-        <div class="logo"><img src="data:image/jpeg;base64,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" alt="Logo LI MONT"></div>
+        <div class="logo"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCAFAAUADASIAAhEBAxEB/8QAGwABAAIDAQEAAAAAAAAAAAAAAAUGAgMEBwH/xAA6EAEAAgIBAgIGCAQEBwAAAAAAAQIDBAUGERIhMUFRYZGxEyJCcYGhwdEHFDJSIzND8BYlYoKS4fH/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAwIBBAX/xAAkEQEBAAIBBAIDAAMAAAAAAAAAAQIDERIhMUETMgQiIxRCUf/aAAwDAQACEQMRAD8AmwH1HxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWnp/pCuxgjf5S04dfw+OuPv4ZtX+60+qGOzy3TE5v5enD99aPKdik+G33xHp+MpfLLeMZyr8V45yvCsCS5/h54bdjHW85cGWv0mHJ/dX3++EapLLOYnZZeKAOuAAAAAAAAAAAAAAAAAAAAAAAAAAAADo4/Qz8nt49XWr4sl59forHrmfdDnWrp3/l3TXKcrj/z574qW9dY8v1t3/CGNmXTOzevHqvdCc3p6ehu/y2nnvn+jrFct7RHb6T19vc4Aak4ndm3m9hZOj+no5LP/ADu1Tvq4rfVrMeWW/s+6PX8ETwvE5eZ36auPvWv9WS/b+ivrn9IXbqPlcXTnFY9PSiMea9fBhrH+nX12/wB+tHdnfpj5q+nCffLxEN1p1BOxltxmtf8Awcc/41o+3b+37o+f3KnPol9d3CcXfl+Sw6tYnwTPiyW/tpHpn9PxbxxmvFPLK7Mlg6uw+DgOGm/+ZWsVn/wj9lRW3+IG5S2xq6VJj/CrOS0R6u/lEfCPzVJzR9Gt/wBwBVEAAAAAAAAAAAAAAAAAAAAAAAAAAAAWnpDYwbulu8FsXin8zE2xT7+3nH3+UT+Eqs+1talovW01tWe8TE9piWc8eqcN4ZdN5b9/Q2OM2r62zTwZK/C0e2PbDniJtMRETMzPaIj0ysmDqvDu69dXndKu7Sv9Oanlkj/fumEz0/0/w+XNj5bSttWxUmfBTPWIiLR6/f2+f3J3bcJ+0bmqZ39K6uG0cHSnCX2NvtXLMfSZ5j09/VSPl98yoXJ8jm5XdybeefrXnyr6qV9UR9y5dQbPC8tOOmxztceDH5/RYI8U2t7Znz/BE03Ok+O88Gls7+SPRbN/T+fl+SWq/wC1nNq22c8Yy8SIjiuD3uYyRXVxTNO/1stvKlfx/SFvtl43ojj5xUmM+9kjvMfavPqmf7awg97rfkM9PotSmLSxR5R9HHe0R9/oj8IV697ZL2ve1r3tPebWnvMz75UuGWf27RKZ44fTvf8ArZtbWXd2cmznv48uS3itPvagXQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfa1te0VrWbWtPaIiPOZ9gO7hOJyczyFNWnetP6sl4+xX1z+kLV1fy+PitHHw+j2x2tSK2iv+nj9n3z8u/tdOjgwdG8DfY2IrbZv2m8d/O1/VSPdH7yoW1s5d3YybOe/jy5LTa0+955/TPn1Hpv88OPdagHoeYAAAAAAAAAAAAAAAAAAAAAAAAAAAAbdTUz72xTX1sdsmW8+VY+fuhqWfprcx8PwfI8pXFGXYjJTDWJ9ERPo7+7v8mM8rjOY3hjMrxUhx38P8FaxbkNm+S/rx4fq1j8Z85/JK16P4Skdv5KLe+2S0z81H2eqOY2bza2/mpE/ZxT4Ij4MMfUXMYp715La/wC6/i+aF1bcvOT0TbqnjFds3RHC5Y+rhy4p9tMs/r3Rmz/DzHPedXftHsrmp3/OP2Rev1xzGHt474M8f9ePtPxjsmeO67tt5q4MnF5b5LerWt4p+E/ux07sfbUy05+kFt9F8xrd5rgpsVj14bxM/Ce0pfpLp6dObcrydPoZxd/o6ZY7eDt6bz7Pd8fYtebd19XHS+1mx68X8ojLaK+fsbJri2sMxMY82K0dp9FqzHyYy353HiqY/j4zLmPNOpudtze93pMxq4u8Yqz6/baffPyRD0rc6O4fc7zGvOvaftYLeH8vQg9v+HuavedPepeP7c1fDPxjv8l9e/XJx4efZo2W8+VRErtdK8zqd5to3yVj7WKYvH5eaMy4smG3hy47459l6zX5rzKXxULjZ5jEfO8e2GzBgy7OSMWDHfLefRWkd5/JplgJLkuA2+J1MGfb+jpbNaYjF4u96x29Mo1yWXvHbjZ2oA64AAAAAAAAAAAAAAAAAAAAAAO/ieWvxeTJFsVNjWzV8GbBf0Xj9Jj2uAcslnFdlsvMWGNTpbe+tj39rj7T/p5a+KsfdP8A7Zf8P8FHnPUuHw+6kd/mrgx0X1W+ue8VljW6S0vrZNzb37R9mlZiJ+ER8zJ1jTUxTg4bjcOlSft2iLWn8P37q0HxS+e7vy2fXs27W3sb2ac2zmyZsk/avPf/AOGvtbGnbx62fLht7cd5r8mob4nhPm+U9qdbcxrdovmx7NfZlp5/GO0pfW/iHjntG1oXr7ZxXifyn91KE7pwvpSb854r0jD1twuWPrZ8uGfZkxT+nd0z1Lweava/I6to9l/2mHlwn/i4+qpPysvcehbXNdKY+9rV1M1vZj1/FM/kiN3riMdLYeI0serWfL6S1Y7/AIVjy+PdVBuaMZ57sZb8r47Nmxs5tvNbNsZb5clvTe895lrBZEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//2Q==" alt="Logo LI MONT"></div>
         <h1>LI MONT</h1>
         <p class="tagline">"Não vendemos apenas roupa,<br>vendemos bem-estar e auto-estima"</p>
 
