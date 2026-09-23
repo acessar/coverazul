@@ -79,14 +79,12 @@
     background:var(--blue-deep);
     border:3px solid var(--blue-ring);
     display:flex;align-items:center;justify-content:center;
-    font-family:'Cormorant Garamond',serif;
-    letter-spacing:1px;
-    line-height:1.15;
-    font-size:clamp(13px,3.6vw,16px);
+    overflow:hidden;
     margin-bottom:clamp(38px,7.5vh,58px);
     box-shadow:0 10px 26px rgba(0,0,0,.28);
     flex-shrink:0;
   }
+  .logo img{width:100%;height:100%;object-fit:cover;display:block;}
   h1{
     font-family:'Cormorant Garamond',serif;
     font-weight:600;
@@ -192,6 +190,19 @@
     .page{position:relative;z-index:1;}
     .card{box-shadow:0 40px 90px rgba(20,30,28,.32);}
     .content{min-height:660px;}
+
+    /* a little bigger on desktop: socials, avatars and the link buttons */
+    .socials{gap:22px;margin-bottom:40px;}
+    .socials a{width:54px;height:54px;}
+    .links{gap:18px;}
+    .link-btn{
+      font-size:18px;
+      min-height:64px;
+      padding:12px 30px 12px 10px;
+      gap:16px;
+      border-width:3px;
+    }
+    .avatar{width:58px;height:58px;border-width:2.5px;}
   }
   @media (min-width:1024px) and (min-height:760px){.content{min-height:700px;}}
 
@@ -209,7 +220,7 @@
       <div class="pattern"></div>
       <div class="hill"></div>
       <div class="content">
-        <div class="logo">LI<br>MONT</div>
+        <div class="logo"><img src="data:image/jpeg;base64,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" alt="Logo LI MONT"></div>
         <h1>LI MONT</h1>
         <p class="tagline">"Não vendemos apenas roupa,<br>vendemos bem-estar e auto-estima"</p>
 
@@ -226,7 +237,7 @@
         </div>
 
         <div class="links">
-          <a class="link-btn" href="#"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span> Compras Online</a>
+          <a class="link-btn" href="#"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/><circle cx="12" cy="13" r="1" fill="currentColor" stroke="none"/></svg></span> Compras Online</a>
           <a class="link-btn" href="#"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 8.8c-.3-3 1.6-5.3 3.9-5.3s4.1 2.4 3.7 5.4c-.1.9-.3 1.7-.6 2.4"/><circle cx="12" cy="9" r="3.3"/><path d="M4.8 20.2c1-4.3 3.7-6.6 7.2-6.6s6.2 2.3 7.2 6.6"/></svg></span> Atendente Rafinha</a>
           <a class="link-btn" href="#"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 8.8c-.3-3 1.6-5.3 3.9-5.3s4.1 2.4 3.7 5.4c-.1.9-.3 1.7-.6 2.4"/><circle cx="12" cy="9" r="3.3"/><path d="M4.8 20.2c1-4.3 3.7-6.6 7.2-6.6s6.2 2.3 7.2 6.6"/></svg></span> Atendente Lidi</a>
           <a class="link-btn" href="#"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 8.8c-.3-3 1.6-5.3 3.9-5.3s4.1 2.4 3.7 5.4c-.1.9-.3 1.7-.6 2.4"/><circle cx="12" cy="9" r="3.3"/><path d="M4.8 20.2c1-4.3 3.7-6.6 7.2-6.6s6.2 2.3 7.2 6.6"/></svg></span> Atendente Debora</a>
