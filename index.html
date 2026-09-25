@@ -164,8 +164,15 @@
   @media (min-width:601px){
     :root{
       --logo-d:clamp(96px,20vw,120px);
-      --hill-top:clamp(215px,28vh,260px);
-      --top-gap:calc(var(--hill-top) - (var(--logo-d) / 2));
+      --hill-top:clamp(170px,20vh,200px);
+      /* Logo is centered INSIDE the cream band (not straddling the
+         hill line): top-gap is half of (cream height minus logo
+         height), so the empty space above the logo equals the empty
+         space below it before the blue starts. .logo's margin-bottom
+         is set further down to be larger than that gap in every case,
+         so the title/tagline/etc. always land safely inside the blue
+         area rather than on the cream. */
+      --top-gap:calc((var(--hill-top) - var(--logo-d)) / 2);
     }
     body{
       /* NOTE: intentionally NOT align-items:center here. Centering via
@@ -189,21 +196,19 @@
       padding-bottom:0;
     }
     .content{min-height:640px;}
-    .logo{margin-bottom:clamp(38px,7.5vh,58px);}
+    .logo{margin-bottom:clamp(56px,8vh,72px);}
   }
 
   /* ===== DESKTOP / PC ===== */
   @media (min-width:1024px){
     :root{
       --card-max:440px;
-      /* on desktop the colored area starts a bit earlier (more blue,
-         less cream) and the content is deliberately pushed further
-         down INTO that colored area, instead of the logo straddling
-         the line as it does on mobile/tablet — this is what creates
-         the extra breathing room between the top of the blue area
-         and the actual content. */
-      --hill-top:clamp(150px,20vh,190px);
-      --top-gap:clamp(190px,22vh,250px);
+      /* Same centered-logo approach as tablet: the logo sits centered
+         inside the cream band, with equal empty space above and below
+         it before the blue starts. .logo's margin-bottom (below)
+         covers that gap so the title always lands inside the blue. */
+      --hill-top:clamp(180px,22vh,220px);
+      --top-gap:calc((var(--hill-top) - var(--logo-d)) / 2);
     }
     body{padding:64px 40px;position:relative;overflow-x:hidden;}
     body::before{
@@ -222,7 +227,7 @@
     .page{position:relative;z-index:1;}
     .card{box-shadow:0 40px 90px rgba(20,30,28,.32);}
     .content{min-height:660px;}
-    .logo{margin-bottom:clamp(56px,9vh,80px);}
+    .logo{margin-bottom:clamp(64px,8vh,84px);}
 
     /* a little bigger on desktop: socials, avatars and the link buttons */
     .socials{gap:22px;margin-bottom:40px;}
